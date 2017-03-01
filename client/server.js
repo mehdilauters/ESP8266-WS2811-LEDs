@@ -76,6 +76,6 @@ app.get("/event", function (req, res){
 	res.end();
 });
 
-http.listen(8081, function () {
+http.listen(8080, function () {
 	console.log("Server started!");
 });

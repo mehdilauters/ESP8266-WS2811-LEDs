@@ -10,6 +10,10 @@
 #include "ws2811dma.h"
 #include "psu.h"
 
+void user_rf_pre_init(void) {
+}
+
+
 void ICACHE_FLASH_ATTR wifi_init() {
 	/*** Connect to WiFi ***/
 	wifi_set_opmode(STATION_MODE);
