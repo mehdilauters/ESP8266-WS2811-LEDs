@@ -3,6 +3,9 @@ from animations.color import *
 from animations.volumeBar import *
 from animations.sceptrum import *
 from animations.tbm import *
+from animations.christmas import *
+from animations.tree import *
+from animations.volumeIntensity import *
 
 import urlparse
 
@@ -69,10 +72,18 @@ class WebuiHTTPHandler(BaseHTTPRequestHandler):
         self.server.app.set_animation(_id, animation)
       elif _name == 'volumeBar':
         self.server.app.set_animation(_id, VolumeBar())
+      elif _name == 'volumeIntensity':
+        self.server.app.set_animation(_id, VolumeIntensity())
       elif _name == 'sceptrum':
         self.server.app.set_animation(_id, Sceptrum())
       elif _name == 'tbm':
         self.server.app.set_animation(_id, Tbm())
+      elif _name == 'christmas':
+        self.server.app.set_animation(_id, Christmas())
+      elif _name == 'tree':
+        self.server.app.set_animation(_id, Tree())
+      elif _name == 'flash':
+        self.server.app.flash(_id)
       elif _name == 'none':
         self.server.app.set_animation(_id, None)
       

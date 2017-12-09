@@ -25,6 +25,9 @@ from animations.volumeBar import *
 from animations.chenillard import *
 from animations.sceptrum import *
 from animations.tbm import *
+from animations.christmas import *
+from animations.tree import *
+from animations.volumeIntensity import *
 
 default_baseurl='http://localhost:8080'
 default_database='./kodi-rfid.db'
@@ -128,6 +131,23 @@ class Strip():
     self.reversed = reversed
     self.masterStrip.strips.append(self)
   
+  def flash(self):
+    if self.animation is not None:
+      self.animation.lock.acquire()
+    for i in range(0,self.len):
+      self.get_pixel(i).set_intensity(1)
+      self.get_pixel(i).set_color(1,1,1)
+    self.has_changed()
+    self.write()
+    time.sleep(0.1)
+    for i in range(0,self.len):
+      self.get_pixel(i).set_intensity(0)
+      self.get_pixel(i).set_color(1,1,1)
+    self.has_changed()
+    self.write()
+    if self.animation is not None:
+      self.animation.lock.release()
+  
   def write(self):
     return self.masterStrip.write()
   
@@ -197,7 +217,7 @@ class Kodi(Thread):
 
 class App(Thread):
   def __init__(self, _strips):
-    self.animations = ['none', 'color', 'rainbow', 'volumeBar', 'sceptrum', 'tbm']
+    self.animations = ['none', 'color', 'rainbow', 'volumeBar', 'volumeIntensity', 'sceptrum', 'tbm', 'christmas', 'tree', 'flash']
     
     Thread.__init__(self)
     self.masterStrips = _strips
@@ -221,11 +241,16 @@ class App(Thread):
         if self.pause:
           time.sleep(1)
         else:
+          threads = []
           for masterStrip in self.masterStrips:
             for strip in masterStrip.strips:
               if strip.animation is not None:
                 strip.animation.set_max_intensity(self.max_intensity)
-                strip.animation.run_once()
+                t = threading.Thread(target=strip.animation._run_once)
+                t.start()
+                threads.append(t)
+            for t in threads:    
+              t.join()
               masterStrip.write()
           time.sleep(1/50.)
 
@@ -243,7 +268,18 @@ class App(Thread):
         if strip.animation is not None:
           strip.animation.stop()
         strip.set_animation(copy.copy(_animation))
-      
+  
+  def flash(self, _id):
+    threads = []
+    strips = self.get_strips()
+    for id, strip in enumerate(strips):
+      if id == _id or _id == -1:
+        t = threading.Thread(target=strip.flash)
+        t.start()
+        threads.append(t)
+    for t in threads:    
+      t.join()
+  
   def get_max_intensity(self):
     return self.max_intensity
   
