@@ -1,0 +1,22 @@
+{
+  "name": "led",
+  "homepage": "https://github.com/mehdilauters/ESP8266-WS2811-LEDs",
+  "authors": [
+    "Mehdi <mlauters@fly-n-sense.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "www/js/components/",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-bootstrap-colorpicker": "^3.0.31",
+    "angularjs-slider": "^6.2.3"
+  }
+}

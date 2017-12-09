@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html ng-app="helloApp">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Light control</title>
+<link rel="stylesheet"
+	href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<script
+	src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script
+	src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script
+	src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular.min.js"></script>
+	
+	<link rel="stylesheet"
+	href="/js/components/angular-bootstrap-colorpicker/css/colorpicker.min.css">
+	<link rel="stylesheet"
+	href="/js/components/angularjs-slider/dist/rzslider.min.css">
+	
+<script src="/js/components/angularjs-slider/dist/rzslider.min.js" ></script>
+<script src="/js/components/angular-bootstrap-colorpicker/js/bootstrap-colorpicker-module.min.js" ></script>
+<script src="/js/main.js"></script>
+</head>
+<body ng-controller="HelloCtrl">
+  <style>
+  .strip_pixels li {
+    display: inline;
+    list-style: none; /* pour enlever les puces sur IE7 */
+    margin: 0px;
+    width:20px;
+    height:20px;
+  }
+  
+  </style>
+	<header class="navbar navbar-static-top" id="top" role="banner">
+	<div class="container">
+		<div class="navbar-header">
+			<button class="navbar-toggle" type="button" data-toggle="collapse"
+				data-target=".bs-navbar-collapse">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
+			</button>
+			<a href="/" class="navbar-brand">Hello-AngularJS</a>
+		</div>		
+	</div>
+	</header>
+	<div class="container">
+		<div class="page-header" style="margin: 0">
+			<h1>Hello World</h1>
+		</div>
+		<div style="padding-top: 15px">This example demonstrate the code
+			sample for Hello World program. Type your name in the text field
+			below</div>
+    <ul>
+      <li>All
+        <ul>
+          <li><button ng-click="next()" >next animation</button></li>
+          <li ng-repeat="animation_name in status.animations" >
+              <button ng-click="animation(-1, animation_name)" >{{animation_name}}</button>
+          </li>
+          <li><input colorpicker="rgb" type="text" ng-model="test" /></li>
+          <li>
+            <div>
+              <rzslider rz-slider-model="max_intensity" rz-slider-options="slider_callbacks"></rzslider>
+            </div>
+          </li>
+        </ul>
+      </li>
+      <li ng-repeat="(index, strip) in status.strips" >
+        <div>
+          {{strip.animation}} 
+          <ul>
+            <li>
+              <ul class="strip_pixels">
+                <li ng-repeat="pixel in strip.pixels" style="background-color:rgb({{pixel[0]}}, {{pixel[1]}}, {{pixel[2]}})">&nbsp;
+                </li>
+              </ul>
+            <li>
+            <li ng-repeat="animation_name in status.animations" >
+              <button ng-click="animation(index, animation_name)" >{{animation_name}}</button>
+            </li>
+<!--             <li><input rel="{{index}}" colorpicker="rgb" type="text" ng-model="colors[index]" /></li> -->
+            <li>
+              <div>
+                <rzslider rz-slider-model="intensities[index]" rz-slider-options="slider_callbacks"></rzslider>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </li>
+    </ul>
+    
+	</div>
+</body>
+</html>	
