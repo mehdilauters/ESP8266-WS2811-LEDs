@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from zeroconf import ServiceBrowser, Zeroconf
+
 import copy
 from threading import Lock,Thread
 import time
@@ -30,7 +32,7 @@ playlist_id = 0
 
 UDP_PORT = 2711
 
-nbLed = 100
+nbLed = 50
 
 
 class Pixel:
@@ -241,18 +243,41 @@ class App(Thread):
 
 print "main"
 strips = []
-ms = MasterStrip('192.168.1.33', UDP_PORT, nbLed)
+
+
+class MyListener(object):
+
+    def remove_service(self, zeroconf, type, name):
+        print("Service %s removed" % (name,))
+
+    def add_service(self, zeroconf, type, name):
+        info = zeroconf.get_service_info(type, name)
+        print("Service %s added, service info: %s:%s" % (name, info.name, info.port))
+        count = int(info.properties['led_count'])
+        ms = MasterStrip(info.server, info.port, count)
+        if count > 50:
+          strip = Strip(ms, 0, int(count/2))
+          strip = Strip(ms, int(count/2), int(count/2), True)
+          strip.set_animation( Color() )
+        else:
+          strip = Strip(ms, 0, count)
+        strips.append(ms)
+        
+zeroconf = Zeroconf()
+listener = MyListener()
+browser = ServiceBrowser(zeroconf, "_fastled._udp.local.", listener)
+
+#ms = MasterStrip('192.168.1.84', UDP_PORT, nbLed)
 #strip = Strip(ms, 0, nbLed)
-strip = Strip(ms, 0, 62)
-strip = Strip(ms, 62, 38, True)
-strips.append(ms)
+#strip = Strip(ms, 0, 62)
+#strip = Strip(ms, 62, 38, True)
+#strips.append(ms)
 
 #strips.append(Strip('192.168.1.34', UDP_PORT, nbLed))
 time.sleep(2)
 
 app = App(strips)
 app.start()
-#app.set_animation(0,Tbm())
 #time.sleep(2)
 #app.set_animation(None)
 app.join()
