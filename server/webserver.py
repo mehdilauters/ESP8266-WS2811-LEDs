@@ -84,7 +84,7 @@ class WebuiHTTPHandler(BaseHTTPRequestHandler):
       for s in strips:
         pixels = []
         for i in range(0, s.len):
-          pixels.append(s.get_pixel(i).get_raw_color())
+          pixels.append(s.get_pixel(i).get_buffer_rgb())
         _strips.append({
             'pixel_count': s.len,
             'reversed': s.reversed,

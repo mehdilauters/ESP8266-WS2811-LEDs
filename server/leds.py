@@ -36,12 +36,18 @@ nbLed = 50
 
 
 class Pixel:
-  def __init__(self):
+  def __init__(self, colors):
     self.r = 0
     self.g = 0
     self.b = 0
     self.i = 0
     self.set_color(0,0,0,0)
+    if colors == 'RGB':
+      self.get_buffer = self.get_buffer_rgb
+    elif colors == 'GRB':
+      self.get_buffer = self.get_buffer_grb
+    else:
+      print 'invalid color %s'%colors
   
   def set_color(self, _r, _g, _b, _i = None):
     if _r > 1:
@@ -56,23 +62,35 @@ class Pixel:
     if _i is not None:
       self.set_intensity(_i)
   
-  def get_raw_color(self):
+  def get_buffer_rgb(self):
     return [
       int(self.r * self.i * 255),
       int(self.g * self.i * 255),
       int(self.b * self.i * 255)
       ]
   
+  def get_buffer_gbr(self):
+    return [
+      int(self.g * self.i * 255),
+      int(self.b * self.i * 255),
+      int(self.r * self.i * 255)
+      ]
+  
+  def get_buffer_grb(self):
+    return [
+      int(self.g * self.i * 255),
+      int(self.r * self.i * 255),
+      int(self.b * self.i * 255),
+      ]
+  
   def set_intensity(self, _i):
     if _i > 1:
       raise Exception('i > 1')
     self.i = _i
-    
-  def get_buffer(self):
-    return self.get_raw_color()
+
 
 class MasterStrip():
-  def __init__(self, _ip, _port, _len):
+  def __init__(self, _ip, _port, _len, _colors = 'RGB'):
     self.sock = socket.socket(socket.AF_INET, # Internet
              socket.SOCK_DGRAM) # UDP
     self.len = _len
@@ -80,8 +98,9 @@ class MasterStrip():
     self.port = _port
     self.pixels = []
     self.strips = []
+    self.colors = _colors
     for i in range(0, _len):
-      self.pixels.append(Pixel())
+      self.pixels.append(Pixel(self.colors))
     self.write()
   
   def has_changed(self):
@@ -254,7 +273,8 @@ class MyListener(object):
         info = zeroconf.get_service_info(type, name)
         print("Service %s added, service info: %s:%s" % (name, info.name, info.port))
         count = int(info.properties['led_count'])
-        ms = MasterStrip(info.server, info.port, count)
+        colors = info.properties['colors']
+        ms = MasterStrip(info.server, info.port, count, colors)
         if count > 50:
           strip = Strip(ms, 0, int(count/2))
           strip = Strip(ms, int(count/2), int(count/2), True)
