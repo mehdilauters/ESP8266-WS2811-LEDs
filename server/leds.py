@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from zeroconf import ServiceBrowser, Zeroconf
+#from zeroconf import ServiceBrowser, Zeroconf
 
 import copy
 from threading import Lock,Thread
@@ -28,6 +28,8 @@ from animations.tbm import *
 from animations.christmas import *
 from animations.tree import *
 from animations.volumeIntensity import *
+from animations.volumeIntensity import *
+from animations.candles import *
 
 default_baseurl='http://localhost:8080'
 default_database='./kodi-rfid.db'
@@ -112,14 +114,17 @@ class MasterStrip():
         return True
   
   def write(self):
-    if self.has_changed():
-      buf = [0,0,0,0,len(self.pixels)]
-      for p in self.pixels:
-        buf = buf + p.get_buffer()
-      self.sock.sendto(str(bytearray(buf)), (self.ip, self.port))
-      
-      for strip in strips:
-        strip.changed = False
+    try:
+      if self.has_changed():
+        buf = [0,0,0,0,len(self.pixels)]
+        for p in self.pixels:
+          buf = buf + p.get_buffer()
+        self.sock.sendto(str(bytearray(buf)), (self.ip, self.port))
+        
+        for strip in strips:
+          strip.changed = False
+    except:
+      print "network error"
 
 class Strip():
   def __init__(self, _ms, _start, _len, reversed=False):
@@ -217,7 +222,7 @@ class Kodi(Thread):
 
 class App(Thread):
   def __init__(self, _strips):
-    self.animations = ['none', 'color', 'rainbow', 'volumeBar', 'volumeIntensity', 'sceptrum', 'tbm', 'christmas', 'tree', 'flash']
+    self.animations = ['none', 'color', 'rainbow', 'volumeBar', 'volumeIntensity', 'sceptrum', 'tbm', 'christmas', 'tree', 'candles', 'flash']
     
     Thread.__init__(self)
     self.masterStrips = _strips
@@ -246,7 +251,7 @@ class App(Thread):
             for strip in masterStrip.strips:
               if strip.animation is not None:
                 strip.animation.set_max_intensity(self.max_intensity)
-                t = threading.Thread(target=strip.animation._run_once)
+                t = threading.Thread(target=strip.animation.run_once)
                 t.start()
                 threads.append(t)
             for t in threads:    
@@ -319,21 +324,26 @@ class MyListener(object):
           strip = Strip(ms, 0, count)
         strips.append(ms)
         
-zeroconf = Zeroconf()
-listener = MyListener()
-browser = ServiceBrowser(zeroconf, "_fastled._udp.local.", listener)
+#zeroconf = Zeroconf()
+#listener = MyListener()
+#browser = ServiceBrowser(zeroconf, "_fastled._udp.local.", listener)
 
-#ms = MasterStrip('192.168.1.84', UDP_PORT, nbLed)
-#strip = Strip(ms, 0, nbLed)
-#strip = Strip(ms, 0, 62)
-#strip = Strip(ms, 62, 38, True)
+ms = MasterStrip('ledstrip.local', UDP_PORT, 100)
+strip = Strip(ms, 0, 62)
+strip = Strip(ms, 62, 37, True)
+strips.append(ms)
+
+
+#ms = MasterStrip('ledstrip_goodlock.local', UDP_PORT, 100,'GRB' )
+#strip = Strip(ms, 0, 50)
+#strip = Strip(ms, 50, 50, True)
 #strips.append(ms)
 
 #strips.append(Strip('192.168.1.34', UDP_PORT, nbLed))
-time.sleep(2)
 
 app = App(strips)
 app.start()
-#time.sleep(2)
-#app.set_animation(None)
+time.sleep(2)
+app.set_animation(None)
+#app.set_animation(-1, Candles())
 app.join()

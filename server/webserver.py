@@ -6,6 +6,7 @@ from animations.tbm import *
 from animations.christmas import *
 from animations.tree import *
 from animations.volumeIntensity import *
+from animations.candles import *
 
 import urlparse
 
@@ -82,6 +83,8 @@ class WebuiHTTPHandler(BaseHTTPRequestHandler):
         self.server.app.set_animation(_id, Christmas())
       elif _name == 'tree':
         self.server.app.set_animation(_id, Tree())
+      elif _name == 'candles':
+        self.server.app.set_animation(_id, Candles())
       elif _name == 'flash':
         self.server.app.flash(_id)
       elif _name == 'none':
@@ -174,6 +177,7 @@ class WebuiHTTPHandler(BaseHTTPRequestHandler):
           return self._get_intensity(dparams['min'][0], dparams['max'][0])
         elif len(args) == 1 and args[0] == 'status.json':
           return self._get_status()
+          return
         else:
           return self._get_file(path)
       

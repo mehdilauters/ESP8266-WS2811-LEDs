@@ -1,5 +1,8 @@
+from threading import Lock
+
 class Animation:
   def __init__(self):
+    self.lock = Lock()
     self.strip = None
     self.intensity = 1.
     self.nedd_update = False
